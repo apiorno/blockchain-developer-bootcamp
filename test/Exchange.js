@@ -5,7 +5,7 @@ const tokens = (n) => {
   return ethers.utils.parseUnits(n.toString(), 'ether');
 };
 describe('Token', () => {
-  let deployer, feeAccount, exchange, token1, token2, user1;
+  let deployer, feeAccount, exchange, token1, token2, user1, user2;
   const feePercent = 10;
 
   beforeEach(async () => {
@@ -19,6 +19,7 @@ describe('Token', () => {
     deployer = accounts[0];
     feeAccount = accounts[1];
     user1 = accounts[2];
+    user2 = accounts[3];
 
     let transaction = await token1
       .connect(deployer)
@@ -205,6 +206,72 @@ describe('Token', () => {
             .connect(user1)
             .makeOrder(token2.address, amount, token1.address, amount)
         ).to.be.revertedWith('Insufficient balance');
+      });
+    });
+  });
+
+  describe('Order actions', async () => {
+    let transaction, result;
+    let amount = tokens(1);
+
+    beforeEach(async () => {
+      // Deposit tokens before making orders
+
+      // Approve tokens to exchange
+      transaction = await token1
+        .connect(user1)
+        .approve(exchange.address, amount);
+
+      // Deposit tokens to exchange
+      transaction = await exchange
+        .connect(user1)
+        .depositToken(token1.address, amount);
+      result = await transaction.wait();
+
+      // Make order
+      transaction = await exchange
+        .connect(user1)
+        .makeOrder(token2.address, amount, token1.address, amount);
+
+      result = await transaction.wait();
+    });
+    describe('Cancelling orders', async () => {
+      describe('Success', async () => {
+        beforeEach(async () => {
+          transaction = await exchange.connect(user1).cancelOrder(1);
+          result = await transaction.wait();
+        });
+
+        it('updates cancelled orders', async () => {
+          const orderCancelled = await exchange.orderCancelled(1);
+          expect(orderCancelled).to.equal(true);
+        });
+
+        it('emits a Cancel event', async () => {
+          const log = result.events[0];
+          expect(log.event).to.equal('Cancel');
+
+          const event = log.args;
+          expect(event.id).to.equal(1);
+          expect(event.user).to.equal(user1.address);
+          expect(event.tokenGet).to.equal(token2.address);
+          expect(event.amountGet).to.equal(amount);
+          expect(event.tokenGive).to.equal(token1.address);
+          expect(event.amountGive).to.equal(amount);
+          expect(event.timestamp).to.exist;
+        });
+      });
+      describe('Failure', async () => {
+        it('fails for invalid order ids', async () => {
+          await expect(
+            exchange.connect(user1).cancelOrder(2)
+          ).to.be.revertedWith('Invalid order id');
+        });
+        it('fails for unauthorized users', async () => {
+          await expect(
+            exchange.connect(user2).cancelOrder(1)
+          ).to.be.revertedWith('Unauthorized user');
+        });
       });
     });
   });
