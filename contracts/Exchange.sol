@@ -69,10 +69,7 @@ contract Exchange {
     // ------------------------
     // DEPOSIT & WITHDRAW TOKEN
     function depositToken(address _token, uint256 _amount) public {
-        require(
-            Token(_token).transferFrom(msg.sender, address(this), _amount),
-            "Token not approved"
-        );
+        require(Token(_token).transferFrom(msg.sender, address(this), _amount));
 
         tokens[_token][msg.sender] += _amount;
 
