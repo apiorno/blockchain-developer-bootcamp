@@ -15,19 +15,28 @@ async function main() {
   console.log('Chain Id:', chainId);
 
   // Fetch deployed tokens
-  const Dapp = await ethers.getContractAt('Token', config[chainId]['Dapp']);
+  const Dapp = await ethers.getContractAt(
+    'Token',
+    config[chainId]['Dapp']['address']
+  );
   console.log(`Dapp Token fetched: ${Dapp.address}\n`);
 
-  const mETH = await ethers.getContractAt('Token', config[chainId]['mETH']);
+  const mETH = await ethers.getContractAt(
+    'Token',
+    config[chainId]['mETH']['address']
+  );
   console.log(`mETH Token fetched: ${mETH.address}\n`);
 
-  const mDAI = await ethers.getContractAt('Token', config[chainId]['mDAI']);
+  const mDAI = await ethers.getContractAt(
+    'Token',
+    config[chainId]['mDAI']['address']
+  );
   console.log(`mDAI Token fetched: ${mDAI.address}\n`);
 
   // Fetch deployed exchange
   const exchange = await ethers.getContractAt(
     'Exchange',
-    config[chainId]['exchange']
+    config[chainId]['exchange']['address']
   );
   console.log(`Exchange fetched: ${exchange.address}\n`);
 
