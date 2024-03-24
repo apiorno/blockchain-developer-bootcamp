@@ -14,7 +14,34 @@
     },
     "explorerURL": "#"
   },
-  "42": {
-    "explorerURL": "https://kovan.etherscan.io/"
+  "11155111": {
+    "exchange": {
+      "address": ""
+    },
+    "DApp": {
+      "address": ""
+    },
+    "mETH": {
+      "address": ""
+    },
+    "mDAI": {
+      "address": ""
+    },
+    "explorerURL": "https://sepolia.etherscan.io/"
+  },
+  "80001": {
+    "exchange": {
+      "address": ""
+    },
+    "DApp": {
+      "address": ""
+    },
+    "mETH": {
+      "address": ""
+    },
+    "mDAI": {
+      "address": ""
+    },
+    "explorerURL": "https://mumbai.polygonscan.com/"
   }
 }
